@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת רישום | התחברות</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h1 class="mt-5">התחברות מערכת</h1>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="email">אנא הזן את האימייל שלך שאיתו אתה רשום למערכת</label>
+                        <input type="email" placeholder="chabad@yskg.org :לדוגמה" class="form-control" id="email"
+                            required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">התחבר</button>
+                </form>
+                <div id="message" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const messageDiv = document.getElementById('message');
+            fetch(`/checkEmail?email=${email}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data) return messageDiv.innerHTML = '<div class="alert alert-warning">!כתובת אימייל לא נמצאה</div>';
+                    // Email found in the database
+                    console.log(data)
+                    fetch(`/login?email=${email}`, { method: 'POST' })
+                        .then(response => {
+                            if (response.ok) {
+                                messageDiv.innerHTML = '<div class="alert alert-success">!התחברת בהצלחה</div>';
+                                window.location.href = "/"
+                            } else {
+                                messageDiv.innerHTML = '<div class="alert alert-danger">!ההתחברות נכשלה</div>';
+                            }
+                        });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    messageDiv.innerHTML = '<div class="alert alert-danger">.בעיה קרתה במהלך תהליך ההתחברות</div>';
+                });
+        });
+    </script>
+</body>
+
+</html>

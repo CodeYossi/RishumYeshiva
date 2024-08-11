@@ -6,7 +6,6 @@ const overseersDB = new QuickDB({ filePath: "./databases/overseers.sqlite", tabl
 const sdorimDB = new QuickDB({ filePath: "./databases/sdorim.sqlite", table: "sdorim" })
 const studentsDB = new QuickDB({ filePath: "./databases/students.sqlite", table: "students" })
 const teachersDB = new QuickDB({ filePath: "./databases/teachers.sqlite", table: "teachers" })
-// תיכנס אצלך במחשב לקישור http://localhost:3000 זה אמור להראות לך את האתר
 // זמנים ולוח שנה יהודי
 const { toJewishDate, formatJewishDateInHebrew, toGregorianDate } = require("jewish-date")
 const moment = require("moment")
@@ -24,16 +23,52 @@ const hebrewJewishDate = function (date) {
 // שרת 
 const express = require("express")
 const app = express()
+const cookieParser = require("cookie-parser")
+app.use(cookieParser())
 app.use(require("body-parser").urlencoded({ extended: true }))
 app.set("view engine", "ejs")
 // שונות
 const showCurrentSeder = require("./functions/showCurrentSeder")
+const getStaffByEmail = require("./functions/getStaffByEmail")
 // routes
 app.get("/", async (req, res) => {
+    if (!req.cookies.email) return res.redirect("/login")
+    const staffUser = await getStaffByEmail(overseersDB, teachersDB, req.cookies.email)
+    if (!staffUser || Object.keys(staffUser).length === 0) {
+        res.clearCookie("email")
+        res.redirect("/login")
+        return
+    }
     const currentSeder = showCurrentSeder((await sdorimDB.all()), (await lessonsDB.all()))
-    res.render("main.ejs", { currentSeder, time: hebrewJewishDate(new Date()) })
+    res.render("main.ejs", { currentSeder, time: `${hebrewJewishDate(new Date())}, ${moment().format("LT").replace("AM", 'לפה"צ').replace("PM", 'אחה"צ')}`, staffUser })
 })
-app.get("/jewishDate", (req, res) => res.json({ letters: hebrewJewishDate(new Date()), numbers: toJewishDate(new Date()), gregorian: moment().format("L") }))
+app.get("/login", async (req, res) => {
+    if (req.cookies.email) return res.redirect("/")
+    res.render("login.ejs")
+})
+app.get("/checkEmail", async (req, res) => {
+    console.log(req.query)
+    if (!req.query || !req.query.email) return res.send(false)
+    const allStaff = {}
+        ; (await overseersDB.all()).forEach((x => {
+            allStaff[x.id] = { ...x.value, type: "overseer" }
+        }))
+        ; (await teachersDB.all()).forEach((x => {
+            allStaff[x.id] = { ...x.value, type: "teacher" }
+        }))
+    let found = false
+    Object.keys(allStaff).forEach(x => {
+        if (allStaff[x].email === req.query.email) {
+            res.json({ result: allStaff[x] }); found = true
+            return
+        }
+    })
+    console.log(found)
+    if (!found) return res.send(false)
+})
+app.get("/jewishDate", (req, res) => {
+    res.json({ letters: hebrewJewishDate(new Date()), numbers: toJewishDate(new Date()), gregorian: moment().format("L") }) 
+})
 app.get("/findClass")
 app.get("/findStudent", async (req, res) => {
     const { name, shiur } = req.query
@@ -54,8 +89,23 @@ app.get("/styles/:fileName", (req, res) => {
     if (require("fs").readdirSync("./views/styles").includes(fileName)) return res.sendFile(__dirname + "/views/styles/" + fileName)
     else return res.sendStatus(404)
 })
+app.post("/login", async (req, res) => {
+    if (!req.query || !req.query.email) return res.send(false)
+    const email = req.query.email
+    res.cookie("email", email).sendStatus(200)
+})
+app.delete("/logout", async(req, res) => {
+    if(!req.cookies || !req.cookies.email) return true
+    try {
+        res.clearCookie("email")
+        res.sendStatus(200)
+    } catch (err) {
+        console.log(`Error while trying to disconnect, email: ${req.cookies.email}`)
+        return res.sendStatus(403)
+    }
+})
 
 // launch app
-app.listen(3000, () => {``
+app.listen(8000, () => {
     console.log("App Running on Port 3000.")
 })

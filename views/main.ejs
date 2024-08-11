@@ -10,11 +10,10 @@
 </head>
 
 <body dir="rtl">
-    <h2 class="d-inline-block">שלום, {משתמש}!</h2>
-    <h4 class="d-inline-block" style="cursor: pointer; color: var(--bs-danger)">התנתק</h4>
-    <h3>
-        <%= time %>
-    </h3>
+    <div id="message" class="mt-3"></div>
+    <h2 class="d-inline-block">שלום, <%= staffUser.name %>!</h2>
+    <h4 class="d-inline-block" style="cursor: pointer; color: var(--bs-danger)" onclick="logout()">התנתק</h4>
+    <h3><%= time %></h3>
     <br />
     <% if(Array.isArray(currentSeder)) { %>
         <% if(currentSeder.length> 1) { %>
@@ -40,5 +39,14 @@
                                         <p>אין סדרים כעת</p>
                                         <% } %>
 </body>
-
+<script>
+    const messageDiv = document.getElementById("message")
+    function logout() {
+        fetch("/logout", { method: "DELETE"})
+        .then((res) => {
+            if(res.ok) return window.location.href = "/login"
+            else return messageDiv.innerHTML = '<div class="alert alert-danger">.בעיה קרתה במהלך תהליך ההתנתקות</div>';
+        })
+    }
+</script>
 </html>
