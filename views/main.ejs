@@ -13,16 +13,24 @@
     <div id="message" class="mt-3"></div>
     <h2 class="d-inline-block">שלום, <%= staffUser.name %>!</h2>
     <h4 class="d-inline-block" style="cursor: pointer; color: var(--bs-danger)" onclick="logout()">התנתק</h4>
-    <h3><%= time %></h3>
+    <h3>
+        <%= time %>
+    </h3>
+    <p class="d-inline-block">
+        תפקידך בישיבה הוא: <p class="d-inline-block" style="font-weight: bold;"><%= yourRole %></p>
+    </p>
+    <p class="d-inline-block">
+        סדרים / שיעורים עליהם הנך אחראי: <p class="d-inline-block" style="font-weight: bold;"><%= responsibleSdorim.map(x => x).join(", ") %></p>
+    </p>
     <br />
-    <% if(Array.isArray(currentSeder)) { %>
+    <% if(Array.isArray(currentSeder) && currentSeder[0].message !== false) { %>
         <% if(currentSeder.length> 1) { %>
             <p>הסדרים הנוכחיים שברשותך הם:</p>
-            <% } else { %>
+            <% } else if(currentSeder.length===1) { %>
                 <p>הסדר הנוכחי שברשותך הוא:</p>
-                <% } %>
+                <% } else if(currentSeder.length===0) {} %>
                     <% } else {} %>
-                        <% if(Array.isArray(currentSeder)) { %>
+                        <% if(Array.isArray(currentSeder) && currentSeder[0].message !== false) { %>
                             <% currentSeder.forEach((seder)=> { %>
                                 <div
                                     class="p-3 text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-3 d-inline-block">
@@ -42,11 +50,12 @@
 <script>
     const messageDiv = document.getElementById("message")
     function logout() {
-        fetch("/logout", { method: "DELETE"})
-        .then((res) => {
-            if(res.ok) return window.location.href = "/login"
-            else return messageDiv.innerHTML = '<div class="alert alert-danger">.בעיה קרתה במהלך תהליך ההתנתקות</div>';
-        })
+        fetch("/logout", { method: "DELETE" })
+            .then((res) => {
+                if (res.ok) return window.location.href = "/login"
+                else return messageDiv.innerHTML = '<div class="alert alert-danger">.בעיה קרתה במהלך תהליך ההתנתקות</div>';
+            })
     }
 </script>
+
 </html>

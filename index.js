@@ -30,6 +30,7 @@ app.set("view engine", "ejs")
 // שונות
 const showCurrentSeder = require("./functions/showCurrentSeder")
 const getStaffByEmail = require("./functions/getStaffByEmail")
+const getRole = require("./functions/getRole")
 // routes
 app.get("/", async (req, res) => {
     if (!req.cookies.email) return res.redirect("/login")
@@ -39,15 +40,31 @@ app.get("/", async (req, res) => {
         res.redirect("/login")
         return
     }
-    const currentSeder = showCurrentSeder((await sdorimDB.all()), (await lessonsDB.all()))
-    res.render("main.ejs", { currentSeder, time: `${hebrewJewishDate(new Date())}, ${moment().format("LT").replace("AM", 'לפה"צ').replace("PM", 'אחה"צ')}`, staffUser })
+
+    let currentSeder = showCurrentSeder((await sdorimDB.all()), (await lessonsDB.all()))
+    if (currentSeder[0].message !== false) {
+        if (staffUser.type === "overseer") {
+            if (staffUser.seder[0] !== "*") currentSeder = currentSeder.filter(x => staffUser.seder.includes(x.name))
+        } else if (staffUser.type === "teacher") {
+            currentSeder = currentSeder.filter(x => staffUser.lessons.includes(x.name))
+        }
+    }
+    let responsibleSdorim = []
+    if (staffUser.type === "overseer") {
+        if (staffUser.seder[0] === "*") responsibleSdorim.push("הכל")
+        else staffUser.seder.forEach((x) => responsibleSdorim.push(x))
+    } else if (staffUser.type === "teacher") {
+        staffUser.lessons.forEach((x) => responsibleSdorim.push(x.name))
+    }
+    // console.log(currentSeder)
+    res.render("main.ejs", { responsibleSdorim, yourRole: getRole(staffUser), currentSeder, time: `${hebrewJewishDate(new Date())} - ${moment().format("LT").replace("AM", 'לפה"צ').replace("PM", 'אחה"צ')}`, staffUser })
 })
 app.get("/login", async (req, res) => {
     if (req.cookies.email) return res.redirect("/")
     res.render("login.ejs")
 })
 app.get("/checkEmail", async (req, res) => {
-    console.log(req.query)
+    (req.query)
     if (!req.query || !req.query.email) return res.send(false)
     const allStaff = {}
         ; (await overseersDB.all()).forEach((x => {
@@ -63,11 +80,10 @@ app.get("/checkEmail", async (req, res) => {
             return
         }
     })
-    console.log(found)
     if (!found) return res.send(false)
 })
 app.get("/jewishDate", (req, res) => {
-    res.json({ letters: hebrewJewishDate(new Date()), numbers: toJewishDate(new Date()), gregorian: moment().format("L") }) 
+    res.json({ letters: hebrewJewishDate(new Date()), numbers: toJewishDate(new Date()), gregorian: moment().format("L") })
 })
 app.get("/findClass")
 app.get("/findStudent", async (req, res) => {
@@ -94,8 +110,8 @@ app.post("/login", async (req, res) => {
     const email = req.query.email
     res.cookie("email", email).sendStatus(200)
 })
-app.delete("/logout", async(req, res) => {
-    if(!req.cookies || !req.cookies.email) return true
+app.delete("/logout", async (req, res) => {
+    if (!req.cookies || !req.cookies.email) return true
     try {
         res.clearCookie("email")
         res.sendStatus(200)

@@ -4,12 +4,12 @@ async function getStaffByEmail(overseersDB, teachersDB, email) {
     const allTeachers = await teachersDB.all()
     allOverseers.forEach((overseer) => {
         if(overseer.value.email === email) {
-            result = overseer.value
+            result = {...overseer.value, type: "overseer"}
         }
     })
     allTeachers.forEach((teacher) => {
         if(teacher.value.email === email) {
-            result = teacher.email
+            result = {...teacher.email, type: "teacher"}
         }
     })
     return result
