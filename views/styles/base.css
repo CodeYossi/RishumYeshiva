@@ -1,0 +1,15 @@
+* {
+    font-family: "Heebo";
+    font-weight: bold;
+    color: var(--bs-primary-text-emphasis);
+    margin-right: 1%;
+    margin-top: 1%;
+}
+
+/* .disconnect {
+    color: red;
+}
+
+.dis:hover > .disconnect{
+    color: white;
+} */

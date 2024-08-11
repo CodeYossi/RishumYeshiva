@@ -1,4 +1,4 @@
-// db and data
+// databases - ממסדי נתונים
 const { QuickDB } = require("quick.db")
 const classesDB = new QuickDB({ filePath: "./databases/classes.sqlite", table: "classes" })
 const lessonsDB = new QuickDB({ filePath: "./databases/lessons.sqlite", table: "lessons" })
@@ -6,9 +6,11 @@ const overseersDB = new QuickDB({ filePath: "./databases/overseers.sqlite", tabl
 const sdorimDB = new QuickDB({ filePath: "./databases/sdorim.sqlite", table: "sdorim" })
 const studentsDB = new QuickDB({ filePath: "./databases/students.sqlite", table: "students" })
 const teachersDB = new QuickDB({ filePath: "./databases/teachers.sqlite", table: "teachers" })
-// jewish calendar & time.
+// תיכנס אצלך במחשב לקישור http://localhost:3000 זה אמור להראות לך את האתר
+// זמנים ולוח שנה יהודי
 const { toJewishDate, formatJewishDateInHebrew, toGregorianDate } = require("jewish-date")
 const moment = require("moment")
+moment.locale("he")
 const hebrewJewishDate = function (date) {
     let base = formatJewishDateInHebrew(toJewishDate(date)).split(" ")
     // special jewish months
@@ -17,17 +19,20 @@ const hebrewJewishDate = function (date) {
     var year = base[base.length - 1].split("")
     year[0] = `${year[0]}'`
     base[base.length - 1] = year.join("")
-    return base.join(" ")
+    return `${moment().format("dddd")}, ${base.join(" ")}`
 }
-// app 
+// שרת 
 const express = require("express")
 const app = express()
 app.use(require("body-parser").urlencoded({ extended: true }))
 app.set("view engine", "ejs")
-// any
+// שונות
 const showCurrentSeder = require("./functions/showCurrentSeder")
 // routes
-app.get("/", (req, res) => res.json({ message: "Hello World!" }))
+app.get("/", async (req, res) => {
+    const currentSeder = showCurrentSeder((await sdorimDB.all()), (await lessonsDB.all()))
+    res.render("main.ejs", { currentSeder, time: hebrewJewishDate(new Date()) })
+})
 app.get("/jewishDate", (req, res) => res.json({ letters: hebrewJewishDate(new Date()), numbers: toJewishDate(new Date()), gregorian: moment().format("L") }))
 app.get("/findClass")
 app.get("/findStudent", async (req, res) => {
@@ -44,8 +49,13 @@ app.get("/findStudent", async (req, res) => {
 app.get("/showCurrentSeder", async (req, res) => {
     return res.json(showCurrentSeder((await sdorimDB.all()), (await lessonsDB.all())))
 })
+app.get("/styles/:fileName", (req, res) => {
+    const { fileName } = req.params
+    if (require("fs").readdirSync("./views/styles").includes(fileName)) return res.sendFile(__dirname + "/views/styles/" + fileName)
+    else return res.sendStatus(404)
+})
 
 // launch app
-app.listen(3000, () => {
+app.listen(3000, () => {``
     console.log("App Running on Port 3000.")
 })
