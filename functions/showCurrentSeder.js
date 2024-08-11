@@ -27,7 +27,7 @@ function showCurrentSeder(sdorim, lessons) {
                 }
             }
         }
-        return arr.length > 0 ? arr : "אין סדר או שיעור כעת."
+        return arr.length > 0 ? arr : { message: "אין סדר או שיעור כעת." }
     }
     const files = [sdorim, lessons];
     const result = findObjectInTimeRange(files);
