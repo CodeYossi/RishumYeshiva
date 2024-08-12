@@ -1,6 +1,6 @@
 const moment = require("moment")
 moment.locale("he")
-function showCurrentSeder(sdorim, lessons) {
+function showCurrentSeder(sdorim) {
     function timeToMinutes(time) {
         const [hours, minutes] = time.split(':').map(Number)
         return hours * 60 + minutes
@@ -23,16 +23,13 @@ function showCurrentSeder(sdorim, lessons) {
                 if (isCurrentTimeInRange(startTime, endTime)) {
                     const [hours, minutes] = endTime.split(":")
                     const endsIn = moment(new Date().setHours(hours, minutes)).fromNow()
-                    let type = "";
-                    if(file === files[0]) type = "סדר"
-                    else type = "שיעור"
-                    arr.push({ name: item.value.name, endsIn: `${endsIn}, בשעה ${endTime}`, ended: endsIn.startsWith("לפני") ? true : false, type })
+                    arr.push({ name: item.value.name, endsIn: `${endsIn}, בשעה ${endTime}`, ended: endsIn.startsWith("לפני") ? true : false, type: item.value.type === "seder" ? "סדר" : "שיעור" })
                 }
             }
         }
         return arr.length > 0 ? arr : [{ message: false }]
     }
-    const files = [sdorim, lessons];
+    const files = [sdorim];
     const result = findObjectInTimeRange(files);
     return result
 }

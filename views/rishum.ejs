@@ -7,8 +7,7 @@
     <title>מערכת רישום</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-    <link rel="icon" type="image/png"
-        href="https://www.yeshivatchabad.co.il/wp-content/uploads/2021/01/cropped-qxxb10389323-265x88.jpg">
+    <link rel="icon" type="image/png" href="https://www.yeshivatchabad.co.il/wp-content/uploads/2021/01/cropped-qxxb10389323-265x88.jpg">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -45,11 +44,9 @@
 
         .profile-card-container {
             position: absolute;
-            top: 70px;
-            /* Adjust as needed */
+            top: 70px; /* Adjust as needed */
             right: 20px;
-            width: 320px;
-            /* Increased width for better visibility */
+            width: 320px; /* Increased width for better visibility */
             transform: translateX(100%);
             opacity: 0;
             transition: transform 0.5s ease-out, opacity 0.5s ease-out;
@@ -80,8 +77,7 @@
             transform: scale(0.9);
             opacity: 0;
             transition: transform 0.5s ease-out, opacity 0.5s ease-out;
-            margin-top: 20px;
-            /* Add margin for spacing */
+            margin-top: 20px; /* Add margin for spacing */
         }
 
         .account-info.show {
@@ -96,7 +92,6 @@
                 opacity: 0;
                 transform: translateY(-20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -137,55 +132,45 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .card {
-            border: none;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
-
-        .card:hover {
-            transform: scale(1.02);
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        .card-text i {
-            margin-right: 5px;
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .navbar-toggler-icon {
             content: "☰"
         }
 
-        .d-flex {
+        .table-container {
+            max-width: 450px; /* רוחב מקסימלי לטבלה */
+            display: flex;
+            justify-content: flex-end; /* מיקום הטבלה בצד ימין */
+        }
+
+        .table {
+            table-layout: fixed; /* קובע שהטבלה תשתמש ברוחב קבוע לעמודות */
+        }
+
+        .table .name-col {
+            width: 350px; /* רוחב קבוע לעמודת השמות */
+            overflow: hidden; /* מסתיר תוכן שנשפך מהעמודה */
+            text-overflow: ellipsis; /* מציג ... אם התוכן ארוך מדי */
+        }
+
+        .table .status-col {
+            width: 100px; /* רוחב מינימלי לעמודת הסימון */
+            text-align: center; /* ממרכז את התוכן בעמודת הסימון */
             display: flex;
             align-items: center;
+            justify-content: center;
         }
 
-        .me-2 {
-            margin-right: 0.5rem;
+        .form-check-input {
+            transition: transform 0.3s ease; /* אנימציה של שינוי גודל */
+            cursor: pointer; /* משנה את הסמן כאשר עוברים מעל לתיבת הסימון */
         }
 
-        .mb-0 {
-            margin-bottom: 0;
+        .form-check-input:checked {
+            transform: scale(1.2); /* הגדלת תיבת הסימון כשנלחצת */
         }
     </style>
 </head>
@@ -194,8 +179,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm fade-in" id="navbar">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
-                <img src="https://www.yeshivatchabad.co.il/wp-content/uploads/2021/01/cropped-qxxb10389323-265x88.jpg"
-                    alt="Logo">
+                <img src="https://www.yeshivatchabad.co.il/wp-content/uploads/2021/01/cropped-qxxb10389323-265x88.jpg" alt="Logo">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -231,89 +215,60 @@
     <!-- Profile Card -->
     <div class="profile-card-container">
         <div class="profile-card" id="profileCard">
-            <h2>
-                <%= staffUser.name %>
-            </h2>
-            <p><i class="bi bi-envelope"></i> <strong>אימייל:</strong>
-                <%= staffUser.email %>
-            </p>
-            <p><i class="bi bi-briefcase"></i> <strong>תפקיד:</strong>
-                <%= yourRole %>
-            </p>
-            <p><i class="bi bi-bookmark"></i> <strong>סדרים / שיעורים עליהם הנך אחראי:</strong>
-                <%= staffUser.responsibleSdorim.join(", ") %></p>
+            <h2><%= staffUser.name %></h2>
+            <p><i class="bi bi-envelope"></i> <strong>אימייל:</strong> <%= staffUser.email %></p>
+            <p><i class="bi bi-briefcase"></i> <strong>תפקיד:</strong> <%= yourRole %></p>
+            <p><i class="bi bi-bookmark"></i> <strong>סדרים / שיעורים עליהם הנך אחראי:</strong> <%= staffUser.responsibleSdorim.join(", ") %></p>
         </div>
     </div>
 
     <!-- Account Info -->
-    <div class=" container mt-4">
-                    <div id="message"></div>
-                    <div class="account-info" id="accountInfo">
-                        <h2 class="mb-3">שלום, <%= staffUser.name %>!</h2>
-                        <p><i class="bi bi-envelope"></i> <strong>אימייל:</strong>
-                            <%= staffUser.email %>
-                        </p>
-                        <p><i class="bi bi-briefcase"></i> <strong>תפקיד:</strong>
-                            <%= yourRole %>
-                        </p>
-                        <p><i class="bi bi-bookmark"></i> <strong>סדרים / שיעורים עליהם הנך אחראי:</strong>
-                            <%= staffUser.responsibleSdorim.join(", ") %></p>
+    <div class="container mt-4">
+        <div id="message"></div>
+        <div class="account-info" id="accountInfo">
+            <h2 class="mb-3">שלום, <%= staffUser.name %>!</h2>
+            <p><i class="bi bi-envelope"></i> <strong>אימייל:</strong> <%= staffUser.email %></p>
+            <p><i class="bi bi-briefcase"></i> <strong>תפקיד:</strong> <%= yourRole %></p>
+            <p><i class="bi bi-bookmark"></i> <strong>סדרים / שיעורים עליהם הנך אחראי:</strong> <%= staffUser.responsibleSdorim.join(", ") %></p>
         </div>
         <br />
         <h3><%= time %></h3>
-
-        <% if (Array.isArray(currentSeder) && currentSeder.length !== 0 && currentSeder[0].message !== false) { %>
-            <% if (currentSeder.length > 1) { %>
-                <h4>הסדרים הנוכחיים שברשותך הם:</h4>
-            <% } else if (currentSeder.length === 1) { %>
-                <h4>הסדר הנוכחי שברשותך הוא:</h4>
-            <% } %>
-
-            <div class=" row">
-                                <% currentSeder.forEach((seder)=> { %>
-                                    <div class="col-md-4 mb-3">
-                                        <div class="card fade-in">
-                                            <div class="card-body">
-                                                <p class="card-title">
-                                                    <%= seder.name %>
-                                                </p>
-                                                <p class="card-text">
-                                                    <i class="bi bi-tag"></i> <strong>
-                                                        <%= seder.type %>
-                                                    </strong>
-                                                </p>
-                                                <p class="card-text">
-                                                    <i class="bi bi-clock"></i><strong> התחיל ב:</strong>
-                                                    <%= seder.startTime %>
-                                                </p>
-                                                <p class="card-text">
-                                                    <i class="bi bi-clock"></i><strong> מסתיים:</strong>
-                                                    <%= seder.endsIn %>
-                                                </p>
-                                                <p class="card-text">
-                                                    <i class="bi bi-funnel"></i><strong> סינון:</strong>
-                                                    <%= seder.onlyFor ? seder.onlyFor.map(x=> `שיעור ${x}`).join(", ") :
-                                                        "ללא סינון" %>
-                                                </p>
-                                                <div class="d-flex align-items-center">
-                                                    <a href="/rishum/<%= date %>/<%= seder.name.replace(/ /g, '-') %>"
-                                                        class="btn btn-primary me-2">
-                                                        <i class="bi bi-pencil-square"></i> היכנס לרישום
-                                                    </a>
-                                                    <% if (!seder.isRegistered) { %>
-                                                        <p class="text-danger mb-0">לא בוצע רישום</p>
-                                                        <% } %>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                    </div>
-                    <% }) %>
-        </div>
-        <% } else { %>
-            <h4>אין סדרים כעת</h4>
-            <% } %>
-    </div>
+        <h4>רישום על: <%= seder.name %></h4>
+        <h4>רשימת תלמידים:</h4>
+        <% if(seder.type === "seder") { %>
+            <div class="container mt-4">
+                <div class="table-container">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="name-col">שם תלמיד</th>
+                                <th class="status-col">נמצא</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="name">יוסי כהן</td>
+                                <td class="status-col"><input type="checkbox" class="form-check-input"></td>
+                            </tr>
+                            <tr>
+                                <td class="name">מיכל לוי</td>
+                                <td class="status-col"><input type="checkbox" class="form-check-input"></td>
+                            </tr>
+                            <tr>
+                                <td class="name">אבי בן דוד</td>
+                                <td class="status-col"><input type="checkbox" class="form-check-input"></td>
+                            </tr>
+                            <tr>
+                                <td class="name">רונה אביטן</td>
+                                <td class="status-col"><input type="checkbox" class="form-check-input"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn btn-primary mt-3" id="getNames">קבל שמות</button>
+                <pre id="output"></pre>
+            </div>
+        <% } %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -346,7 +301,20 @@
                     else return document.getElementById("message").innerHTML = '<div class="alert alert-danger">.בעיה קרתה במהלך תהליך ההתנתקות</div>';
                 });
         }
+        document.getElementById('getNames').addEventListener('click', () => {
+            const rows = document.querySelectorAll('tbody tr')
+            const selectedNames = []
+
+            rows.forEach(row => {
+                const checkbox = row.querySelector('.form-check-input')
+                if (checkbox.checked) {
+                    const name = row.querySelector('.name').textContent;
+                    selectedNames.push(name)
+                }
+            })
+
+            console.log(selectedNames)
+        })
     </script>
 </body>
-
 </html>

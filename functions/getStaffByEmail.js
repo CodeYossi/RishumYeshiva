@@ -1,15 +1,9 @@
-async function getStaffByEmail(overseersDB, teachersDB, email) {
+async function getStaffByEmail(staffDB, email) {
     let result = {}
-    const allOverseers = await overseersDB.all()
-    const allTeachers = await teachersDB.all()
-    allOverseers.forEach((overseer) => {
-        if(overseer.value.email === email) {
-            result = {...overseer.value, type: "overseer"}
-        }
-    })
-    allTeachers.forEach((teacher) => {
-        if(teacher.value.email === email) {
-            result = {...teacher.email, type: "teacher"}
+    const allStaff = await staffDB.all()
+    allStaff.forEach((staff) => {
+        if(staff.value.email === email) {
+            result = {...staff.value}
         }
     })
     return result
